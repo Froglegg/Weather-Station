@@ -8,19 +8,17 @@ exports.seed = function(knex) {
         {
           userName: "froggleg",
           email: "frogboi@gmail.com",
-          password: "pass123",
+          password: "password123",
           primaryLocation: "Atlanta",
-          locations: JSON.stringify({
-            locations: [
-              "Atlanta",
-              "Asheville",
-              "Boone",
-              "San Diego",
-              "Nanjing",
-              "Yosemite",
-              "Prague"
-            ]
-          }),
+          locations: JSON.stringify([
+            "Atlanta",
+            "Asheville",
+            "Boone",
+            "San Diego",
+            "Nanjing",
+            "Yosemite",
+            "Prague"
+          ]),
           hobby: "doing stuff"
         }
       ]);

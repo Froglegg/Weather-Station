@@ -1,3 +1,8 @@
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+require("dotenv").config();
+const JWT_SECRET = process.env.JWT_SECRET;
+
 const getTableData = (req, res, db) => {
   db.select("*")
     .from("users")
@@ -8,7 +13,7 @@ const getTableData = (req, res, db) => {
         res.json({ dataExists: "false" });
       }
     })
-    .catch(err => res.status(400).json({ dbError: "db error" }));
+    .catch(err => res.status(400).json({ dbError: err }));
 };
 
 const getRowData = (req, res, db) => {
@@ -23,25 +28,113 @@ const getRowData = (req, res, db) => {
         res.json({ dataExists: "false" });
       }
     })
-    .catch(err => res.status(400).json({ dbError: "db error" }));
+    .catch(err => res.status(400).json({ dbError: err }));
 };
 
-const postTableData = (req, res, db) => {
-  const {
-    userName,
-    email,
-    password,
-    primaryLocation,
-    locations,
-    hobby
-  } = req.body;
-  db("users")
-    .insert({ userName, email, password, primaryLocation, locations, hobby })
-    .returning("*")
+const createUser = (req, res, db) => {
+  const { userName, email, primaryLocation, hobby } = req.body;
+  const locations = JSON.stringify(req.body.locations);
+  db.select("*")
+    .from("users")
+    .where({ email })
     .then(item => {
-      res.json(item);
+      if (item.email) {
+        res.json({ emailExists: "true" });
+      } else {
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(req.body.password, salt, (err, hash) => {
+            let password = hash;
+            db("users")
+              .insert({
+                userName,
+                email,
+                password,
+                primaryLocation,
+                locations,
+                hobby
+              })
+              .returning("*")
+              .then(dbUser => {
+                jwt.sign(
+                  { id: dbUser.id, email: dbUser.email },
+                  JWT_SECRET,
+                  { expiresIn: 36000 },
+                  (err, token) => {
+                    res.json({
+                      username: dbUser.username,
+                      password: dbUser.password,
+                      token,
+                      message: "Welcome to Weather Station!",
+                      success: true
+                    });
+                  }
+                );
+              })
+              .catch(err => res.status(400).json({ dbError: err }));
+          });
+        });
+      }
     })
-    .catch(err => res.status(400).json({ dbError: "db error" }));
+    .catch(err => res.status(400).json({ dbError: err }));
+};
+
+const login = async (req, res, db) => {
+  const { email, password } = req.body;
+  // const user = await db
+  //   .select("*")
+  //   .from("users")
+  //   .where({ email })
+  //   .then(user => {
+  //     return user;
+  //   });
+
+  // str = "";
+  // /// maybe you are missing the salt? https://picocoder.io/node-express-tutorial-part-5-user-authentication-jwt/
+  // const isPasswordCorrect = await bcrypt.compare(password, user[0].password);
+  // if (isPasswordCorrect) {
+  //   str = "Password is correct";
+  // } else {
+  //   tr = "Password is wrong";
+  // }
+  // return res.send(str);
+
+  db.select("*")
+    .from("users")
+    .where({ email })
+    .then(async user => {
+      await bcrypt
+        .compare(password, user[0].password)
+        .then(match => {
+          if (match) {
+            jwt.sign(
+              { email, id: user[0].id },
+              JWT_SECRET,
+              { expiresIn: 36000 },
+              (err, token) => {
+                res.json({
+                  message: "Let's get started!",
+                  token,
+                  isAuthed: true
+                });
+              }
+            );
+          } else {
+            res.json({
+              message: "Incorrect credentials",
+              isAuthed: false
+            });
+          }
+        })
+        .catch(err => res.json({ error: "problem with encryption", err: err }));
+    })
+    .catch(err =>
+      res
+        .status(400)
+        .json({
+          message: "DB error, user with that email doesn't exist",
+          err: err
+        })
+    );
 };
 
 const putTableData = (req, res, db) => {
@@ -61,7 +154,7 @@ const putTableData = (req, res, db) => {
     .then(item => {
       res.json(item);
     })
-    .catch(err => res.status(400).json({ dbError: "db error" }));
+    .catch(err => res.status(400).json({ dbError: err }));
 };
 
 const deleteTableData = (req, res, db) => {
@@ -72,13 +165,14 @@ const deleteTableData = (req, res, db) => {
     .then(() => {
       res.json({ delete: "true" });
     })
-    .catch(err => res.status(400).json({ dbError: "db error" }));
+    .catch(err => res.status(400).json({ dbError: err }));
 };
 
 module.exports = {
   getTableData,
   getRowData,
-  postTableData,
+  createUser,
+  login,
   putTableData,
   deleteTableData
 };

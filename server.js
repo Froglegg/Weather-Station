@@ -7,7 +7,6 @@ const cors = require("cors"); // allows/disallows cross-site communication
 const corsOptions = require("./corsOptions");
 const morgan = require("morgan"); // logs requests, use "tiny" or "combined"
 const routes = require("./routes"); // api routes
-
 // Define middleware here
 require("dotenv").config();
 app.use(express.urlencoded({ extended: true }));

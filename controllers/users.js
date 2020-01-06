@@ -53,7 +53,6 @@ const createUser = (req, res, db) => {
               })
               .returning("*")
               .then(dbUser => {
-                console.log(dbUser);
                 jwt.sign(
                   { id: dbUser[0].id },
                   JWT_SECRET,

@@ -17,15 +17,26 @@ class SignUpForm extends Component {
 
   submitFormAdd = async e => {
     e.preventDefault();
-    const response = await api.createUser(this);
-    if (response.token) {
-      Cookies.set("userToken", response.token);
-      alert(response.message);
-
-      window.location.replace("/");
+    if (!this.validateEmail(this.state.email)) {
+      alert("Please enter a valid email address");
     } else {
-      alert(response.message);
+      const response = await api.createUser(this);
+      if (response.err) {
+        alert(response.err);
+      } else if (response.token) {
+        Cookies.set("userToken", response.token);
+        alert(response.message);
+        window.location.replace("/");
+      } else {
+        alert(response.message);
+      }
     }
+  };
+
+  validateEmail = email => {
+    //eslint-disable-next-line
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
   };
 
   componentDidMount() {}
@@ -52,7 +63,7 @@ class SignUpForm extends Component {
             id="email"
             onChange={this.onChange}
             value={this.state.email === null ? "" : this.state.email}
-            placeholder="Enter (any) email address"
+            placeholder="Enter email address"
           />
         </FormGroup>
         <FormGroup>

@@ -23,7 +23,11 @@ class Dashboard extends Component {
     icon: ""
   };
 
-  addLocationToState = location => {
+  addLocationToState = async location => {
+    // let state = await this.state.locations;
+    console.log(location);
+    console.log(this.state.locations);
+    // this.setState({ locations: this.state.locations.concat(location) });
     this.setState(prevState => ({
       locations: [...prevState.locations, location]
     }));
@@ -81,9 +85,12 @@ class Dashboard extends Component {
   };
 
   async componentDidMount() {
-    let userId = await jwt_decode(Cookies.get("userToken")).id;
+    let userId = await jwt_decode(Cookies.get("userToken"));
+    userId = userId.id;
+    console.log(userId);
     this.setState({ user: userId });
-    api.queryUserLocations(this, userId);
+    let response = await api.queryUserLocations(userId);
+    this.setState({ locations: response });
   }
 
   getDataState = () => {
@@ -115,7 +122,10 @@ class Dashboard extends Component {
           <Col className="col-xs-12 text-center">
             {this.state.currentLocation && !this.state.loading ? (
               <div>
-                <h3>Weather Data for {this.state.currentLocation}</h3>
+                <h3>
+                  Weather Data for{" "}
+                  {this.state.currentLocation.split("+").join(" ")}
+                </h3>
               </div>
             ) : (
               ""

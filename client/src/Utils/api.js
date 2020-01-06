@@ -30,9 +30,7 @@ export default {
     });
 
     const body = await response.json();
-    console.log(body);
     return body;
-    // localState.setState({ users: body });
   },
 
   queryUsers: async (localState, id) => {
@@ -47,16 +45,16 @@ export default {
     localState.setState({ user: body });
   },
 
-  queryUserLocations: async (localState, id) => {
+  queryUserLocations: async id => {
     const response = await fetch(`/api/locations/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
       }
     });
-    const body = await response.json();
-    console.log(body);
-    localState.setState({ locations: body });
+    let body = await response.json();
+
+    return body;
   },
 
   queryWeather: async (country, locality) => {

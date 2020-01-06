@@ -19,9 +19,11 @@ class SignUpForm extends Component {
     e.preventDefault();
     const response = await api.createUser(this);
     if (response.success) {
-      Cookies.set("userToken", response.token);
+      // Cookies.set("userToken", response.token);
       alert(response.message);
-      window.location.replace("/");
+      window.location.replace("/login");
+    } else {
+      alert(response.message);
     }
   };
 

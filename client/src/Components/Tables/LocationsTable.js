@@ -64,7 +64,7 @@ class LocationsTable extends Component {
             <th>Delete</th>
           </tr>
         </thead>
-        <tbody>{this.props.locations.length ? { locations } : ""}</tbody>
+        <tbody>{locations}</tbody>
       </Table>
     );
   }

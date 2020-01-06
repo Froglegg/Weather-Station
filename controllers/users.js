@@ -37,11 +37,11 @@ const createUser = (req, res, db) => {
   db.select("*")
     .from("users")
     .where({ email })
-    .then(item => {
+    .then(async item => {
       if (item.email) {
         res.json({ emailExists: "true" });
       } else {
-        bcrypt.genSalt(10, (err, salt) => {
+        await bcrypt.genSalt(10, (err, salt) => {
           bcrypt.hash(req.body.password, salt, (err, hash) => {
             let password = hash;
             db("users")
@@ -62,7 +62,7 @@ const createUser = (req, res, db) => {
                       userName: dbUser.userName,
                       password: dbUser.password,
                       token,
-                      message: `Welcome to Weather Station!`,
+                      message: `Welcome to Weather Station! Please login to continue.`,
                       success: true
                     };
                     res.json(obj);

@@ -10,22 +10,26 @@ const getData = (req, res) => {
       `https://maps.googleapis.com/maps/api/geocode/json?components=locality:${req.body.locality}|country:${req.body.country}&key=${GOOGLE_API}`
     )
     .then(result => {
-      let lat = result.data.results[0].geometry.location.lat;
-      let lng = result.data.results[0].geometry.location.lng;
-      axios
-        .get(`https://api.darksky.net/forecast/${DARK_API}/${lat},${lng}`)
-        .then(response => {
-          if (response) {
-            console.log(response.data);
-            res.status(200).json([response.data]);
-          } else {
-            res.json({ dataExists: "false" });
-          }
-        })
-        .catch(error => {
-          console.log(error);
-          res.status(400).json({ apiError: "api error" });
-        });
+      if (result.data.results.length) {
+        let lat = result.data.results[0].geometry.location.lat;
+        let lng = result.data.results[0].geometry.location.lng;
+        axios
+          .get(`https://api.darksky.net/forecast/${DARK_API}/${lat},${lng}`)
+          .then(response => {
+            if (response) {
+              console.log(response.data);
+              res.status(200).json([response.data]);
+            } else {
+              res.json({ dataExists: "false" });
+            }
+          })
+          .catch(error => {
+            console.log(error);
+            res.status(400).json({ apiError: "api error" });
+          });
+      } else {
+        res.json({ dataExists: "false" });
+      }
     })
     .catch(error => {
       console.log(error);
@@ -63,13 +67,27 @@ const getUserLocations = (req, res, db) => {
 
 const postLocation = (req, res, db) => {
   const { user, country, locality } = req.body;
-  db("locations")
-    .insert({ user, country, locality })
-    .returning("*")
-    .then(item => {
-      res.json(item);
-    })
-    .catch(err => res.status(400).json({ dbError: "db error" }));
+
+  // check to see if location even exists!
+  axios
+    .get(
+      `https://maps.googleapis.com/maps/api/geocode/json?components=locality:${locality}|country:${country}&key=${GOOGLE_API}`
+    )
+    .then(result => {
+      if (result.data.status !== "OK") {
+        res.status(400).json({
+          err: `No results found for your request, please make sure to fill out both locality and country fields and that the place you are searching for actually exists`
+        });
+      } else {
+        db("locations")
+          .insert({ user, country, locality })
+          .returning("*")
+          .then(item => {
+            res.json(item);
+          })
+          .catch(err => res.status(400).json({ dbError: "db error" }));
+      }
+    });
 };
 
 const deleteLocation = (req, res, db) => {

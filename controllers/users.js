@@ -58,13 +58,14 @@ const createUser = (req, res, db) => {
                   JWT_SECRET,
                   { expiresIn: 36000 },
                   (err, token) => {
-                    return res.json({
-                      username: dbUser.username,
+                    let obj = {
+                      userName: dbUser.userName,
                       password: dbUser.password,
                       token,
-                      message: "Welcome to Weather Station!",
+                      message: `Welcome to Weather Station!`,
                       success: true
-                    });
+                    };
+                    res.json(obj);
                   }
                 );
               })

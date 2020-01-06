@@ -8,3 +8,18 @@
 .title {
   align-content: center;
 }
+
+.weatherIcon {
+  animation: floaty 3s infinite;
+  transition: all 2.5s ease;
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}

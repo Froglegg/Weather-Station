@@ -5,13 +5,16 @@ export default {
       headers: {
         "Content-Type": "application/json"
       },
-      body: localState.newUserObj
+      body: JSON.stringify({
+        email: localState.state.email,
+        password: localState.state.password,
+        userName: localState.state.userName,
+        hobby: localState.state.hobby
+      })
     });
 
     const body = await response.json();
-    console.log(body);
     return body;
-    // localState.setState({ users: body });
   },
 
   login: async localState => {
@@ -85,7 +88,6 @@ export default {
       })
     });
     const response = await request.json();
-    console.log(response);
     return response;
   },
 

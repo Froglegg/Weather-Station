@@ -38,25 +38,32 @@ class Dashboard extends Component {
 
   addDataToState = (data, country, locality) => {
     let dataState = { ...this.state.data };
+    if (!data.length || !data) {
+      dataState.currentSummary = "No weather data found!";
+    } else {
+      if (data[0].currently) {
+        dataState.currentSummary = data[0].currently.summary;
+        dataState.currentIcon = data[0].currently.icon;
+      }
 
-    dataState.currentSummary = data[0].currently.summary;
-    dataState.currentIcon = data[0].currently.icon;
-    dataState.minutelySummary = data[0].minutely.summary;
-    dataState.minutelyIcon = data[0].minutely.icon;
-    dataState.hourlySummary = data[0].hourly.summary;
-    dataState.hourlyIcon = data[0].hourly.icon;
-    dataState.dailySummary = data[0].daily.summary;
-    dataState.dailyIcon = data[0].daily.icon;
+      if (data[0].minutely) {
+        dataState.minutelySummary = data[0].minutely.summary;
+        dataState.minutelyIcon = data[0].minutely.icon;
+      }
+
+      if (data[0].hourly) {
+        dataState.hourlySummary = data[0].hourly.summary;
+        dataState.hourlyIcon = data[0].hourly.icon;
+      }
+
+      if (data[0].daily) {
+        dataState.dailySummary = data[0].daily.summary;
+        dataState.dailyIcon = data[0].daily.icon;
+      }
+    }
 
     dataState = JSON.stringify(dataState);
-    // const currentSummary = data[0].currently.summary;
-    // const currentIcon = data[0].currently.icon;
-    // const minutelySummary = data[0].minutely.summary;
-    // const minutelyIcon = data[0].minutely.icon;
-    // const hourlySummary = data[0].hourly.summary;
-    // const hourlyIcon = data[0].hourly.icon;
-    // const dailySummary = data[0].daily.summary;
-    // const dailyIcon = data[0].daily.icon;
+
     this.setState({
       data: dataState,
       currentLocation: `${locality}, ${country}`,
@@ -64,6 +71,7 @@ class Dashboard extends Component {
     });
   };
 
+  // async spinner to pass down through props to locations table
   loadingData = loading => {
     if (loading === true) {
       this.setState({ loading: true });
@@ -85,7 +93,7 @@ class Dashboard extends Component {
 
   render() {
     return (
-      <Container className="Dashboard">
+      <Container className="Dashboard h-100">
         <Row>
           <Col>
             <h1 style={{ margin: "20px 0" }}>Weather Station</h1>
@@ -103,15 +111,15 @@ class Dashboard extends Component {
             </Link>
           </Col>
         </Row>
-        <Row className="mt-2">
-          <Col>
+        <Row className="mt-2 justify-items-center align-items-center">
+          <Col className="col-xs-12 text-center">
             {this.state.currentLocation && !this.state.loading ? (
               <div>
                 <h3>Weather Data for {this.state.currentLocation}</h3>
               </div>
             ) : (
               ""
-            )}{" "}
+            )}
             {this.state.loading ? (
               <PushSpinner
                 size={30}
@@ -125,9 +133,9 @@ class Dashboard extends Component {
         </Row>
         {this.state.data ? (
           <Row>
-            <Col className="col-xs-12">
-              <Col className="col-xs-12 m-2 text-center">
-                <div style={{ fontSize: "44px" }}>
+            <Col className="col-xs-12 text-center mt-2">
+              <Col className="col-xs-12 mt-1 text-center">
+                <div style={{ fontSize: "44px" }} className="weatherIcon">
                   <WeatherComponent icon={this.state.icon} />
                 </div>
               </Col>
@@ -140,24 +148,25 @@ class Dashboard extends Component {
         )}
 
         <Row>
-          <Col className="col-xs-12 ">
-            <Row>
-              <Col className="text-left">
-                <h3>Locations</h3>
-
-                <AddLocationModal
-                  user={this.state.user}
-                  addLocationToState={this.addLocationToState}
-                />
-              </Col>
-            </Row>
-            <LocationsTable
-              addDataToState={this.addDataToState}
-              loadingData={this.loadingData}
-              user={this.state.user}
-              locations={this.state.locations}
-              deleteLocationFromState={this.deleteLocationFromState}
-            />
+          <Col className="col-xs-12 mt-2">
+            <h3 className="">Locations</h3>
+            <div style={{ margin: "15px 0px 15px 0px" }}>
+              <AddLocationModal
+                user={this.state.user}
+                addLocationToState={this.addLocationToState}
+              />
+            </div>
+            {this.state.locations ? (
+              <LocationsTable
+                addDataToState={this.addDataToState}
+                loadingData={this.loadingData}
+                user={this.state.user}
+                locations={this.state.locations}
+                deleteLocationFromState={this.deleteLocationFromState}
+              />
+            ) : (
+              ""
+            )}
           </Col>
         </Row>
       </Container>

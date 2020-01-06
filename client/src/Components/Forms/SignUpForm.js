@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-
 import { Button, Form, FormGroup, Label, Input } from "reactstrap";
+import Cookies from "js-cookie";
+import api from "../../Utils/api";
 
 class SignUpForm extends Component {
   state = {
@@ -14,31 +15,14 @@ class SignUpForm extends Component {
     this.setState({ [e.target.name]: e.target.value });
   };
 
-  submitFormAdd = e => {
+  submitFormAdd = async e => {
     e.preventDefault();
-    fetch("/api/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        userName: this.state.userName,
-        email: this.state.email,
-        password: this.state.password,
-
-        hobby: this.state.hobby
-      })
-    })
-      .then(response => response.json())
-      .then(item => {
-        if (Array.isArray(item)) {
-          this.props.addItemToState(item[0]);
-          this.props.toggle();
-        } else {
-          console.log("failure");
-        }
-      })
-      .catch(err => console.log(err));
+    const response = await api.createUser(this);
+    if (response.success) {
+      Cookies.set("userToken", response.token);
+      alert(response.message);
+      window.location.replace("/");
+    }
   };
 
   componentDidMount() {}

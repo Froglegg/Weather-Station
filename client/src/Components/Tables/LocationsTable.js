@@ -20,32 +20,39 @@ class LocationsTable extends Component {
   };
 
   render() {
-    const locations = this.props.locations.map(location => {
-      return (
-        <tr key={location.id}>
-          <td>{location.country}</td>
-          <td>{location.locality.split("+").join(" ")}</td>
-          <td>
-            <Button
-              color="success"
-              onClick={() => this.getData(location.country, location.locality)}
-            >
-              See Data
-            </Button>
-          </td>
-          <td>
-            <div>
+    let locations;
+    if (this.props.locations.length) {
+      locations = this.props.locations.map(location => {
+        return (
+          <tr key={location.id}>
+            <td>{location.country}</td>
+            <td>{location.locality.split("+").join(" ")}</td>
+            <td>
               <Button
-                color="danger"
-                onClick={() => this.deleteLocation(location.id)}
+                color="success"
+                onClick={() =>
+                  this.getData(location.country, location.locality)
+                }
               >
-                Del
+                See Data
               </Button>
-            </div>
-          </td>
-        </tr>
-      );
-    });
+            </td>
+            <td>
+              <div>
+                <Button
+                  color="danger"
+                  onClick={() => this.deleteLocation(location.id)}
+                >
+                  Del
+                </Button>
+              </div>
+            </td>
+          </tr>
+        );
+      });
+    } else {
+      locations = "";
+    }
 
     return (
       <Table responsive hover>
@@ -57,7 +64,7 @@ class LocationsTable extends Component {
             <th>Delete</th>
           </tr>
         </thead>
-        <tbody>{locations}</tbody>
+        <tbody>{this.props.locations.length ? { locations } : ""}</tbody>
       </Table>
     );
   }

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { Table, Button } from "reactstrap";
-import api from "../../Utils/api";
+import { Table } from "reactstrap";
 class WeatherTable extends Component {
   state = {};
 
@@ -21,7 +20,7 @@ class WeatherTable extends Component {
     );
 
     return (
-      <Table responsive hover>
+      <Table responsive>
         <thead>
           <tr>
             <th>Currently</th>

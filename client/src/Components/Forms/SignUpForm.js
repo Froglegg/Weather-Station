@@ -18,10 +18,10 @@ class SignUpForm extends Component {
   submitFormAdd = async e => {
     e.preventDefault();
     const response = await api.createUser(this);
-    if (response.success) {
-      // Cookies.set("userToken", response.token);
-      alert(response.message);
-      window.location.replace("/login");
+    if (response.token) {
+      Cookies.set("userToken", response.token);
+      alert(Cookies.get("userToken"));
+      window.location.replace("/");
     } else {
       alert(response.message);
     }

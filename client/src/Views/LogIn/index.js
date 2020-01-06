@@ -24,9 +24,9 @@ class Login extends Component {
           <Col>
             <br></br>
             <p>
-              Don't have an account?
+              Don't have an account?&nbsp;
               <Link to="/SignUp" className={"App-link"} onClick={() => {}}>
-                &nbsp; Click here to sign up!
+                Click here to sign up!
               </Link>
             </p>
           </Col>

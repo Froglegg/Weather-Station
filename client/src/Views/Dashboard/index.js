@@ -24,10 +24,6 @@ class Dashboard extends Component {
   };
 
   addLocationToState = async location => {
-    // let state = await this.state.locations;
-    console.log(location);
-    console.log(this.state.locations);
-    // this.setState({ locations: this.state.locations.concat(location) });
     this.setState(prevState => ({
       locations: [...prevState.locations, location]
     }));
@@ -85,9 +81,7 @@ class Dashboard extends Component {
   };
 
   async componentDidMount() {
-    let userId = await jwt_decode(Cookies.get("userToken"));
-    userId = userId.id;
-    console.log(userId);
+    let userId = await jwt_decode(Cookies.get("userToken")).id;
     this.setState({ user: userId });
     let response = await api.queryUserLocations(userId);
     this.setState({ locations: response });

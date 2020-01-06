@@ -53,14 +53,13 @@ const createUser = (req, res, db) => {
               })
               .returning("*")
               .then(dbUser => {
+                console.log(dbUser);
                 jwt.sign(
-                  { id: dbUser.id, email: dbUser.email },
+                  { id: dbUser[0].id, email: dbUser[0].email },
                   JWT_SECRET,
                   { expiresIn: 36000 },
                   (err, token) => {
                     let obj = {
-                      userName: dbUser.userName,
-                      password: dbUser.password,
                       token,
                       message: `Welcome to Weather Station! Please login to continue.`,
                       success: true

@@ -41,7 +41,6 @@ export default {
       }
     });
     const body = await response.json();
-    console.log(body);
     localState.setState({ user: body });
   },
 
@@ -97,7 +96,6 @@ export default {
       }
     });
     const response = await request.json();
-    console.log(response);
     cb();
   },
 

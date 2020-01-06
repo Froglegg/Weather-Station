@@ -1,12 +1,17 @@
 import React, { Component } from "react";
-import logo from "./logo.svg";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { PrivateRoute } from "./Utils/PrivateRoute";
+import { getSession } from "./Utils/session";
 import "./App.css";
+
+import LogIn from "./Views/LogIn";
+import SignUp from "./Views/SignUp";
+import Dashboard from "./Views/Dashboard";
+import NoMatch from "./Views/NoMatch";
 
 class App extends Component {
   state = {
-    serverResponse: "",
-    users: "",
-    weatherData: ""
+    session: null
   };
 
   handleInputChange = event => {
@@ -17,59 +22,24 @@ class App extends Component {
   };
 
   componentDidMount() {
-    this.queryServer();
+    let obj = getSession();
+    if (obj) {
+      this.setState({ session: obj.id });
+    }
   }
-
-  queryUsers = async () => {
-    const response = await fetch("/api/users", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
-    const body = await response.json();
-    console.log(body);
-    this.setState({ users: body });
-  };
-
-  queryWeather = async () => {
-    const request = await fetch("/api/weather", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ locality: "santa + cruz", country: "ES" })
-    });
-    const response = await request.json();
-    console.log(response);
-    // this.setState({ weatherData: body });
-  };
-
-  queryServer = async () => {
-    const response = await fetch(`/api/hello`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
-    const body = await response.json();
-    this.setState({ serverResponse: body.express });
-  };
 
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>{this.state.serverResponse}</p>
-
-          <button onClick={this.queryUsers}>query users</button>
-          <p>Response from DB: {this.state.userResponse}</p>
-
-          <button onClick={this.queryWeather}>query weather api</button>
-          <p>Response from DB: {this.state.weatherData}</p>
-        </header>
-      </div>
+      <Router>
+        <div>
+          <Switch>
+            <Route exact path="/LogIn" component={LogIn} />
+            <Route exact path="/SignUp" component={SignUp} />
+            <PrivateRoute exact path="/" component={Dashboard} />
+            <Route component={NoMatch} />
+          </Switch>
+        </div>
+      </Router>
     );
   }
 }

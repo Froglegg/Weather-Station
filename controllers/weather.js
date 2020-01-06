@@ -2,11 +2,12 @@ const axios = require("axios").default;
 require("dotenv").config();
 const DARK_API = process.env.DARK_API;
 const GOOGLE_API = process.env.GOOGLE_API;
+
 const getData = (req, res) => {
-  // console.log(req.body);
+  console.log(req.body);
   axios
     .get(
-      `https://maps.googleapis.com/maps/api/geocode/json?components=locality:santa+cruz|country:ES&key=${GOOGLE_API}`
+      `https://maps.googleapis.com/maps/api/geocode/json?components=locality:${req.body.locality}|country:${req.body.country}&key=${GOOGLE_API}`
     )
     .then(result => {
       let lat = result.data.results[0].geometry.location.lat;
@@ -32,6 +33,60 @@ const getData = (req, res) => {
     });
 };
 
+const getLocations = (req, res, db) => {
+  db.select("*")
+    .from("locations")
+    .then(items => {
+      if (items.length) {
+        res.json(items);
+      } else {
+        res.json({ dataExists: "false" });
+      }
+    })
+    .catch(err => res.status(400).json({ dbError: err }));
+};
+
+const getUserLocations = (req, res, db) => {
+  const { id } = req.params;
+  db.select("*")
+    .from("locations")
+    .where({ user: id })
+    .then(items => {
+      if (items) {
+        res.json(items);
+      } else {
+        res.json({ dataExists: "false" });
+      }
+    })
+    .catch(err => res.status(400).json({ dbError: err }));
+};
+
+const postLocation = (req, res, db) => {
+  const { user, country, locality } = req.body;
+  db("locations")
+    .insert({ user, country, locality })
+    .returning("*")
+    .then(item => {
+      res.json(item);
+    })
+    .catch(err => res.status(400).json({ dbError: "db error" }));
+};
+
+const deleteLocation = (req, res, db) => {
+  const { id } = req.params;
+  db("locations")
+    .where({ id })
+    .del()
+    .then(() => {
+      res.json({ delete: "true" });
+    })
+    .catch(err => res.status(400).json({ dbError: err }));
+};
+
 module.exports = {
-  getData
+  getLocations,
+  getUserLocations,
+  postLocation,
+  getData,
+  deleteLocation
 };

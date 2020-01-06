@@ -9,16 +9,6 @@ exports.seed = function(knex) {
           userName: "froggleg",
           email: "frogboi@gmail.com",
           password: "password123",
-          primaryLocation: "Atlanta",
-          locations: JSON.stringify([
-            "Atlanta",
-            "Asheville",
-            "Boone",
-            "San Diego",
-            "Nanjing",
-            "Yosemite",
-            "Prague"
-          ]),
           hobby: "doing stuff"
         }
       ]);

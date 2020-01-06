@@ -4,8 +4,6 @@ exports.up = function(knex) {
     table.string("userName", 255);
     table.text("email").notNullable();
     table.string("password", 255);
-    table.string("primaryLocation", 255);
-    table.json("locations");
     table.text("hobby");
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table.unique(["email"]);

@@ -16,7 +16,7 @@ const getTableData = (req, res, db) => {
     .catch(err => res.status(400).json({ dbError: err }));
 };
 
-const getRowData = (req, res, db) => {
+const getRowData = (req, res, db, cb) => {
   const { id } = req.params;
   db.select("*")
     .from("users")
@@ -32,8 +32,8 @@ const getRowData = (req, res, db) => {
 };
 
 const createUser = (req, res, db) => {
-  const { userName, email, primaryLocation, hobby } = req.body;
-  const locations = JSON.stringify(req.body.locations);
+  const { userName, email, hobby } = req.body;
+  // const locations = JSON.stringify(req.body.locations);
   db.select("*")
     .from("users")
     .where({ email })
@@ -49,8 +49,6 @@ const createUser = (req, res, db) => {
                 userName,
                 email,
                 password,
-                primaryLocation,
-                locations,
                 hobby
               })
               .returning("*")
@@ -60,7 +58,7 @@ const createUser = (req, res, db) => {
                   JWT_SECRET,
                   { expiresIn: 36000 },
                   (err, token) => {
-                    res.json({
+                    return res.json({
                       username: dbUser.username,
                       password: dbUser.password,
                       token,
@@ -80,23 +78,6 @@ const createUser = (req, res, db) => {
 
 const login = async (req, res, db) => {
   const { email, password } = req.body;
-  // const user = await db
-  //   .select("*")
-  //   .from("users")
-  //   .where({ email })
-  //   .then(user => {
-  //     return user;
-  //   });
-
-  // str = "";
-  // /// maybe you are missing the salt? https://picocoder.io/node-express-tutorial-part-5-user-authentication-jwt/
-  // const isPasswordCorrect = await bcrypt.compare(password, user[0].password);
-  // if (isPasswordCorrect) {
-  //   str = "Password is correct";
-  // } else {
-  //   tr = "Password is wrong";
-  // }
-  // return res.send(str);
 
   db.select("*")
     .from("users")
@@ -111,11 +92,13 @@ const login = async (req, res, db) => {
               JWT_SECRET,
               { expiresIn: 36000 },
               (err, token) => {
-                res.json({
+                let obj = {
                   message: "Let's get started!",
                   token,
                   isAuthed: true
-                });
+                };
+                res.json(obj);
+                // cb(obj);
               }
             );
           } else {
@@ -128,28 +111,19 @@ const login = async (req, res, db) => {
         .catch(err => res.json({ error: "problem with encryption", err: err }));
     })
     .catch(err =>
-      res
-        .status(400)
-        .json({
-          message: "DB error, user with that email doesn't exist",
-          err: err
-        })
+      res.status(400).json({
+        message: "DB error, user with that email doesn't exist",
+        err: err
+      })
     );
 };
 
 const putTableData = (req, res, db) => {
   const { id } = req.params;
-  const {
-    userName,
-    email,
-    password,
-    primaryLocation,
-    locations,
-    hobby
-  } = req.body;
+  const { userName, email, password, hobby } = req.body;
   db("users")
     .where({ id })
-    .update({ userName, email, password, primaryLocation, locations, hobby })
+    .update({ userName, email, password, hobby })
     .returning("*")
     .then(item => {
       res.json(item);

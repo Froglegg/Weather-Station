@@ -2,6 +2,7 @@ const whitelist = [
   "http://localhost:3001/",
   "http://localhost:3000/",
   "http://localhost:5000/",
+  "http://localhost:6379/",
   "http://api.darksky.net",
   "https://ducks-love-rain.herokuapp.com"
 ];

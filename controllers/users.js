@@ -55,13 +55,13 @@ const createUser = (req, res, db) => {
               .then(dbUser => {
                 console.log(dbUser);
                 jwt.sign(
-                  { id: dbUser[0].id, email: dbUser[0].email },
+                  { id: dbUser[0].id },
                   JWT_SECRET,
                   { expiresIn: 36000 },
                   (err, token) => {
                     let obj = {
                       token,
-                      message: `Welcome to Weather Station! Please login to continue.`,
+                      message: `Welcome to Weather Station!`,
                       success: true
                     };
                     res.json(obj);
@@ -88,7 +88,7 @@ const login = async (req, res, db) => {
         .then(match => {
           if (match) {
             jwt.sign(
-              { email, id: user[0].id },
+              { id: user[0].id },
               JWT_SECRET,
               { expiresIn: 36000 },
               (err, token) => {

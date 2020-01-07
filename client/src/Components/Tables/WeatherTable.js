@@ -3,19 +3,17 @@ import { Table } from "reactstrap";
 class WeatherTable extends Component {
   state = {};
 
-  dataState = this.props.getDataState();
-
   componentDidMount() {
-    this.dataState = this.props.getDataState();
+    // this.dataState = this.props.getDataState();
   }
 
   render() {
     const weather = (
       <tr>
-        <td>{this.dataState.currentSummary}</td>
-        <td>{this.dataState.minutelySummary}</td>
-        <td>{this.dataState.hourlySummary}</td>
-        <td>{this.dataState.dailySummary}</td>
+        <td>{this.props.currently}</td>
+        <td>{this.props.minutely}</td>
+        <td>{this.props.hourly}</td>
+        <td>{this.props.daily}</td>
       </tr>
     );
 

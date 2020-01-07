@@ -17,10 +17,10 @@ class Dashboard extends Component {
   state = {
     locations: [],
     user: "",
-    data: "",
     currentLocation: "",
     loading: false,
-    icon: ""
+    icon: "",
+    data: false
   };
 
   addLocationToState = async location => {
@@ -36,38 +36,18 @@ class Dashboard extends Component {
     this.setState({ locations: updatedlocations });
   };
 
+  // passes data from weather api, up from the locations table child component props after clicking the get data button... a callback function, basically
   addDataToState = (data, country, locality) => {
-    let dataState = { ...this.state.data };
-    if (!data.length || !data) {
-      dataState.currentSummary = "No weather data found!";
-    } else {
-      if (data[0].currently) {
-        dataState.currentSummary = data[0].currently.summary;
-        dataState.currentIcon = data[0].currently.icon;
-      }
-
-      if (data[0].minutely) {
-        dataState.minutelySummary = data[0].minutely.summary;
-        dataState.minutelyIcon = data[0].minutely.icon;
-      }
-
-      if (data[0].hourly) {
-        dataState.hourlySummary = data[0].hourly.summary;
-        dataState.hourlyIcon = data[0].hourly.icon;
-      }
-
-      if (data[0].daily) {
-        dataState.dailySummary = data[0].daily.summary;
-        dataState.dailyIcon = data[0].daily.icon;
-      }
-    }
-
-    dataState = JSON.stringify(dataState);
-
+    const { currently, minutely, hourly, daily } = data[0];
+    const icon = data[0].currently.icon;
     this.setState({
-      data: dataState,
+      data: true,
+      currently: currently ? currently.summary : "",
+      minutely: minutely ? minutely.summary : "",
+      hourly: hourly ? hourly.summary : "",
+      daily: daily ? daily.summary : "",
       currentLocation: `${locality}, ${country}`,
-      icon: data[0].currently.icon
+      icon: icon ? icon : ""
     });
   };
 
@@ -86,11 +66,6 @@ class Dashboard extends Component {
     let response = await api.queryUserLocations(userId);
     this.setState({ locations: response });
   }
-
-  getDataState = () => {
-    const obj = JSON.parse(this.state.data);
-    return obj;
-  };
 
   render() {
     return (
@@ -144,7 +119,12 @@ class Dashboard extends Component {
                 </div>
               </Col>
 
-              <WeatherTable getDataState={this.getDataState} />
+              <WeatherTable
+                currently={this.state.currently ? this.state.currently : ""}
+                minutely={this.state.minutely ? this.state.minutely : ""}
+                hourly={this.state.hourly ? this.state.hourly : ""}
+                daily={this.state.daily ? this.state.daily : ""}
+              />
             </Col>
           </Row>
         ) : (

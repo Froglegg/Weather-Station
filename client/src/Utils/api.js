@@ -95,7 +95,7 @@ export default {
         "Content-Type": "application/json"
       }
     });
-    const response = await request.json();
+    await request.json();
     cb();
   },
 

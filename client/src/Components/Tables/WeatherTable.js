@@ -10,10 +10,18 @@ class WeatherTable extends Component {
   render() {
     const weather = (
       <tr>
-        <td>{this.props.currently}</td>
-        <td>{this.props.minutely}</td>
-        <td>{this.props.hourly}</td>
-        <td>{this.props.daily}</td>
+        <td>
+          <p>{this.props.currently}</p>
+        </td>
+        <td>
+          <p>{this.props.minutely}</p>
+        </td>
+        <td>
+          <p>{this.props.hourly}</p>
+        </td>
+        <td>
+          <p>{this.props.daily}</p>
+        </td>
       </tr>
     );
 
